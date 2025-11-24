@@ -386,11 +386,11 @@ export default function ReviewerTasksPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         {(task.status === 'pending' || task.status === 'ongoing' || task.status === 'rejected') && (
                           <button
                             onClick={() => handleShowGuide(task)}
-                            className="text-primary-600 hover:text-primary-800"
+                            className="px-3 py-1 bg-primary-600 hover:bg-primary-700 text-white rounded text-sm"
                           >
                             {task.status === 'rejected' ? '재제출' : '가이드 확인'}
                           </button>
@@ -398,7 +398,7 @@ export default function ReviewerTasksPage() {
                         {(task.status === 'pending' || task.status === 'ongoing') && (
                           <button
                             onClick={() => setDecliningTaskId(task.id)}
-                            className="text-red-600 hover:text-red-800"
+                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
                           >
                             작업 거절
                           </button>
@@ -408,7 +408,7 @@ export default function ReviewerTasksPage() {
                             href={task.submit_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary-600 hover:text-primary-800"
+                            className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm"
                           >
                             링크
                           </a>
