@@ -189,7 +189,7 @@ export default function CafesPage() {
       const currentPageCafes = cafes
         .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
         .map(cafe => cafe.id);
-      setSelectedCafes([...new Set([...selectedCafes, ...currentPageCafes])]);
+      setSelectedCafes(Array.from(new Set([...selectedCafes, ...currentPageCafes])));
     } else {
       const currentPageCafes = cafes
         .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
