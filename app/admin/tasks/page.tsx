@@ -21,6 +21,18 @@ export default function TasksPage() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [reassigningTaskId, setReassigningTaskId] = useState<string | null>(null);
   const [newReviewerId, setNewReviewerId] = useState('');
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    cafe_link: '',
+    business_name: '',
+    place_address: '',
+    need_photo: false,
+    special_note: '',
+    title_guide: '',
+    content_guide: '',
+    comment_guide: '',
+    deadline: '',
+  });
   const [formData, setFormData] = useState({
     reviewer_id: '',
     cafe_id: '',
@@ -191,6 +203,59 @@ export default function TasksPage() {
     } catch (error: any) {
       console.error('Reassign error:', error);
       alert(`재분배 중 오류가 발생했습니다: ${error.message || 'Unknown error'}`);
+    }
+  };
+
+  const handleEditTask = (task: any) => {
+    setEditingTaskId(task.id);
+    setEditFormData({
+      cafe_link: task.cafe_link || '',
+      business_name: task.business_name || '',
+      place_address: task.place_address || '',
+      need_photo: task.need_photo || false,
+      special_note: task.special_note || '',
+      title_guide: task.title_guide || '',
+      content_guide: task.content_guide || '',
+      comment_guide: task.comment_guide || '',
+      deadline: task.deadline ? task.deadline.split('T')[0] : '',
+    });
+  };
+
+  const handleUpdateTask = async () => {
+    if (!editingTaskId) return;
+
+    try {
+      const res = await fetch('/api/admin/tasks/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task_id: editingTaskId,
+          ...editFormData,
+        }),
+      });
+
+      if (res.ok) {
+        setEditingTaskId(null);
+        setEditFormData({
+          cafe_link: '',
+          business_name: '',
+          place_address: '',
+          need_photo: false,
+          special_note: '',
+          title_guide: '',
+          content_guide: '',
+          comment_guide: '',
+          deadline: '',
+        });
+        fetchData();
+        alert('작업이 수정되었습니다.');
+      } else {
+        const data = await res.json();
+        alert(`수정 실패: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error: any) {
+      console.error('Update task error:', error);
+      alert(`수정 중 오류가 발생했습니다: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -582,6 +647,145 @@ export default function TasksPage() {
           </div>
         )}
 
+        {/* 작업 가이드 수정 모달 */}
+        {editingTaskId && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white mb-10">
+              <div className="mt-3">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">작업 가이드 수정</h3>
+                <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      카페 링크
+                    </label>
+                    <input
+                      type="url"
+                      value={editFormData.cafe_link}
+                      onChange={(e) => setEditFormData({ ...editFormData, cafe_link: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      사업자명
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.business_name}
+                      onChange={(e) => setEditFormData({ ...editFormData, business_name: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      주소
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.place_address}
+                      onChange={(e) => setEditFormData({ ...editFormData, place_address: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      마감일
+                    </label>
+                    <input
+                      type="date"
+                      value={editFormData.deadline}
+                      onChange={(e) => setEditFormData({ ...editFormData, deadline: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={editFormData.need_photo}
+                        onChange={(e) => setEditFormData({ ...editFormData, need_photo: e.target.checked })}
+                        className="mr-2"
+                      />
+                      <span className="text-sm text-gray-700">사진 필요</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      특이사항
+                    </label>
+                    <textarea
+                      value={editFormData.special_note}
+                      onChange={(e) => setEditFormData({ ...editFormData, special_note: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={3}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      제목 가이드
+                    </label>
+                    <textarea
+                      value={editFormData.title_guide}
+                      onChange={(e) => setEditFormData({ ...editFormData, title_guide: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={3}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      내용 가이드
+                    </label>
+                    <textarea
+                      value={editFormData.content_guide}
+                      onChange={(e) => setEditFormData({ ...editFormData, content_guide: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={5}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      댓글 가이드
+                    </label>
+                    <textarea
+                      value={editFormData.comment_guide}
+                      onChange={(e) => setEditFormData({ ...editFormData, comment_guide: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={5}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2 justify-end mt-6">
+                  <button
+                    onClick={() => {
+                      setEditingTaskId(null);
+                      setEditFormData({
+                        cafe_link: '',
+                        business_name: '',
+                        place_address: '',
+                        need_photo: false,
+                        special_note: '',
+                        title_guide: '',
+                        content_guide: '',
+                        comment_guide: '',
+                        deadline: '',
+                      });
+                    }}
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
+                  >
+                    취소
+                  </button>
+                  <button
+                    onClick={handleUpdateTask}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                  >
+                    수정
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {(() => {
           const filteredTasks = tasks.filter((task) => {
             // 상태 필터
@@ -687,43 +891,53 @@ export default function TasksPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {task.status === 'submitted' && (
-                      <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
+                      {(task.status === 'pending' || task.status === 'ongoing') && (
                         <button
-                          onClick={() => handleApprove(task.id)}
-                          className="text-green-600 hover:text-green-800"
+                          onClick={() => handleEditTask(task)}
+                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
                         >
-                          승인
+                          가이드 수정
                         </button>
+                      )}
+                      {task.status === 'submitted' && (
+                        <>
+                          <button
+                            onClick={() => handleApprove(task.id)}
+                            className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm"
+                          >
+                            승인
+                          </button>
+                          <button
+                            onClick={() => handleReject(task.id)}
+                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
+                          >
+                            거부
+                          </button>
+                        </>
+                      )}
+                      {task.status === 'declined' && (
                         <button
-                          onClick={() => handleReject(task.id)}
-                          className="text-red-600 hover:text-red-800"
+                          onClick={() => {
+                            setReassigningTaskId(task.id);
+                            setNewReviewerId('');
+                          }}
+                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
                         >
-                          거부
+                          재분배
                         </button>
-                      </div>
-                    )}
-                    {task.status === 'declined' && (
-                      <button
-                        onClick={() => {
-                          setReassigningTaskId(task.id);
-                          setNewReviewerId('');
-                        }}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        재분배
-                      </button>
-                    )}
-                    {task.submit_link && (
-                      <a
-                        href={task.submit_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary-600 hover:text-primary-800"
-                      >
-                        링크
-                      </a>
-                    )}
+                      )}
+                      {task.submit_link && (
+                        <a
+                          href={task.submit_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm"
+                        >
+                          링크
+                        </a>
+                      )}
+                    </div>
                   </td>
                         </tr>
                       ))
