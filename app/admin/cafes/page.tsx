@@ -288,7 +288,25 @@ export default function CafesPage() {
       <div className="px-4 py-6 sm:px-0">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">카페 관리</h1>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
+            {selectedCafes.length > 0 && (
+              <button
+                onClick={handleDeleteSelected}
+                disabled={deleting}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg whitespace-nowrap disabled:opacity-50"
+              >
+                {deleting ? '삭제 중...' : `선택 삭제 (${selectedCafes.length})`}
+              </button>
+            )}
+            {cafes.length > 0 && (
+              <button
+                onClick={handleDeleteAll}
+                disabled={deleting}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg whitespace-nowrap disabled:opacity-50"
+              >
+                {deleting ? '삭제 중...' : '전체 삭제'}
+              </button>
+            )}
             <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg cursor-pointer text-center whitespace-nowrap">
               {uploading ? '업로드 중...' : '📊 엑셀 대량 등록'}
               <input
