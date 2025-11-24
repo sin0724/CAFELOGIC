@@ -1,10 +1,13 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 
+// Railway에서는 DATABASE_PUBLIC_URL을 우선 사용 (배포된 앱에서 접근 가능)
+const connectionString = process.env.DATABASE_PUBLIC_URL || process.env.DATABASE_URL;
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: connectionString,
   // Railway PostgreSQL은 SSL이 필요합니다
-  ssl: process.env.DATABASE_URL?.includes('railway') 
+  ssl: connectionString?.includes('railway') || connectionString?.includes('rlwy.net')
     ? { rejectUnauthorized: false } 
     : process.env.NODE_ENV === 'production' 
     ? { rejectUnauthorized: false } 
