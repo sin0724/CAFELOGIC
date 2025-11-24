@@ -7,6 +7,7 @@ import Link from 'next/link';
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [cleaning, setCleaning] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -41,6 +42,33 @@ export default function AdminDashboard() {
       console.error('Error fetching stats:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCleanup = async () => {
+    if (!confirm('정말로 모든 테스트 데이터를 삭제하시겠습니까?\n\n삭제될 항목:\n- 모든 작업\n- 모든 리뷰어 (관리자 계정 제외)\n- 모든 카페\n- 모든 정산 내역\n\n이 작업은 되돌릴 수 없습니다.')) {
+      return;
+    }
+
+    setCleaning(true);
+    try {
+      const res = await fetch('/api/admin/cleanup', {
+        method: 'POST',
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('테스트 데이터가 성공적으로 삭제되었습니다.');
+        fetchStats(); // 통계 새로고침
+      } else {
+        alert(`삭제 실패: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      alert('삭제 중 오류가 발생했습니다.');
+      console.error('Cleanup error:', error);
+    } finally {
+      setCleaning(false);
     }
   };
 
@@ -119,6 +147,13 @@ export default function AdminDashboard() {
               >
                 작업 생성
               </Link>
+              <button
+                onClick={handleCleanup}
+                disabled={cleaning}
+                className="block w-full text-left px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {cleaning ? '삭제 중...' : '🗑️ 테스트 데이터 삭제'}
+              </button>
             </div>
           </div>
         </div>
