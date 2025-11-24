@@ -31,6 +31,7 @@ async function handler(req: any) {
           WHEN 'submitted' THEN 3
           WHEN 'approved' THEN 4
           WHEN 'rejected' THEN 5
+          WHEN 'declined' THEN 6
         END,
         t.deadline ASC NULLS LAST`,
       [reviewerId]

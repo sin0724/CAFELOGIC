@@ -14,6 +14,8 @@ export default function CafesPage() {
   const [showForm, setShowForm] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<any>(null);
+  const [selectedCafes, setSelectedCafes] = useState<string[]>([]);
+  const [deleting, setDeleting] = useState(false);
   const [formData, setFormData] = useState({
     region: '',
     cafe_link: '',
@@ -179,6 +181,95 @@ export default function CafesPage() {
       document.body.removeChild(a);
     } catch (error) {
       alert('리스트 다운로드 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const currentPageCafes = cafes
+        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+        .map(cafe => cafe.id);
+      setSelectedCafes([...new Set([...selectedCafes, ...currentPageCafes])]);
+    } else {
+      const currentPageCafes = cafes
+        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+        .map(cafe => cafe.id);
+      setSelectedCafes(selectedCafes.filter(id => !currentPageCafes.includes(id)));
+    }
+  };
+
+  const handleSelectCafe = (cafeId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedCafes([...selectedCafes, cafeId]);
+    } else {
+      setSelectedCafes(selectedCafes.filter(id => id !== cafeId));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedCafes.length === 0) {
+      alert('삭제할 카페를 선택해주세요.');
+      return;
+    }
+
+    if (!confirm(`선택한 ${selectedCafes.length}개의 카페를 삭제하시겠습니까?`)) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const res = await fetch('/api/admin/cafes/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cafe_ids: selectedCafes }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(`${data.deleted}개의 카페가 삭제되었습니다.`);
+        setSelectedCafes([]);
+        fetchCafes();
+      } else {
+        alert(`삭제 실패: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      alert('삭제 중 오류가 발생했습니다.');
+      console.error('Delete error:', error);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!confirm('모든 카페를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      return;
+    }
+
+    if (!confirm('정말로 모든 카페를 삭제하시겠습니까? 다시 한 번 확인해주세요.')) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const res = await fetch('/api/admin/cafes/delete-all', {
+        method: 'POST',
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(`모든 카페(${data.deleted}개)가 삭제되었습니다.`);
+        setSelectedCafes([]);
+        fetchCafes();
+      } else {
+        alert(`삭제 실패: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      alert('삭제 중 오류가 발생했습니다.');
+      console.error('Delete all error:', error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -400,6 +491,19 @@ export default function CafesPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <input
+                    type="checkbox"
+                    checked={
+                      cafes
+                        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                        .every(cafe => selectedCafes.includes(cafe.id)) &&
+                      cafes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).length > 0
+                    }
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   지역
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -418,6 +522,14 @@ export default function CafesPage() {
                 .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                 .map((cafe) => (
                 <tr key={cafe.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedCafes.includes(cafe.id)}
+                      onChange={(e) => handleSelectCafe(cafe.id, e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {cafe.region || '-'}
                   </td>

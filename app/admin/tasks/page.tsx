@@ -19,6 +19,8 @@ export default function TasksPage() {
   const itemsPerPage = 10;
   const [rejectingTaskId, setRejectingTaskId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [reassigningTaskId, setReassigningTaskId] = useState<string | null>(null);
+  const [newReviewerId, setNewReviewerId] = useState('');
   const [formData, setFormData] = useState({
     reviewer_id: '',
     cafe_id: '',
@@ -161,6 +163,37 @@ export default function TasksPage() {
     }
   };
 
+  const handleReassign = async () => {
+    if (!reassigningTaskId || !newReviewerId) {
+      alert('리뷰어를 선택해주세요.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/tasks/reassign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task_id: reassigningTaskId,
+          reviewer_id: newReviewerId,
+        }),
+      });
+
+      if (res.ok) {
+        setReassigningTaskId(null);
+        setNewReviewerId('');
+        fetchData();
+        alert('작업이 재분배되었습니다.');
+      } else {
+        const data = await res.json();
+        alert(`재분배 실패: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error: any) {
+      console.error('Reassign error:', error);
+      alert(`재분배 중 오류가 발생했습니다: ${error.message || 'Unknown error'}`);
+    }
+  };
+
   if (loading) {
     return (
       <Layout role="admin">
@@ -202,6 +235,7 @@ export default function TasksPage() {
                 <option value="submitted">제출됨</option>
                 <option value="approved">승인됨</option>
                 <option value="rejected">거부됨</option>
+                <option value="declined">리뷰어 거절</option>
               </select>
             </div>
             <div>
@@ -503,6 +537,51 @@ export default function TasksPage() {
           </div>
         )}
 
+        {/* 재분배 모달 */}
+        {reassigningTaskId && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">작업 재분배</h3>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    새로운 리뷰어 선택
+                  </label>
+                  <select
+                    value={newReviewerId}
+                    onChange={(e) => setNewReviewerId(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="">리뷰어를 선택하세요</option>
+                    {reviewers.map((reviewer) => (
+                      <option key={reviewer.id} value={reviewer.id}>
+                        {reviewer.nickname} ({reviewer.username})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <button
+                    onClick={() => {
+                      setReassigningTaskId(null);
+                      setNewReviewerId('');
+                    }}
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
+                  >
+                    취소
+                  </button>
+                  <button
+                    onClick={handleReassign}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                  >
+                    재분배
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {(() => {
           const filteredTasks = tasks.filter((task) => {
             // 상태 필터
@@ -592,8 +671,10 @@ export default function TasksPage() {
                           ? 'bg-green-100 text-green-800'
                           : task.status === 'submitted'
                           ? 'bg-yellow-100 text-yellow-800'
-                          : task.status === 'rejected'
+                          :                         task.status === 'rejected'
                           ? 'bg-red-100 text-red-800'
+                          : task.status === 'declined'
+                          ? 'bg-orange-100 text-orange-800'
                           : 'bg-gray-100 text-gray-800'
                       }`}
                     >
@@ -602,6 +683,7 @@ export default function TasksPage() {
                       {task.status === 'submitted' && '제출됨'}
                       {task.status === 'approved' && '승인됨'}
                       {task.status === 'rejected' && '거부됨'}
+                      {task.status === 'declined' && '리뷰어 거절'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -620,6 +702,17 @@ export default function TasksPage() {
                           거부
                         </button>
                       </div>
+                    )}
+                    {task.status === 'declined' && (
+                      <button
+                        onClick={() => {
+                          setReassigningTaskId(task.id);
+                          setNewReviewerId('');
+                        }}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        재분배
+                      </button>
                     )}
                     {task.submit_link && (
                       <a

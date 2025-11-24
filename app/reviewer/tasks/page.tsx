@@ -12,6 +12,8 @@ export default function ReviewerTasksPage() {
   const itemsPerPage = 10;
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [submitLink, setSubmitLink] = useState('');
+  const [decliningTaskId, setDecliningTaskId] = useState<string | null>(null);
+  const [declineReason, setDeclineReason] = useState('');
 
   useEffect(() => {
     fetchTasks();
@@ -88,6 +90,34 @@ export default function ReviewerTasksPage() {
       } catch (error) {
         console.error('Failed to update task status:', error);
       }
+    }
+  };
+
+  const handleDecline = async () => {
+    if (!decliningTaskId) return;
+
+    try {
+      const res = await fetch('/api/reviewer/tasks/decline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task_id: decliningTaskId,
+          decline_reason: declineReason || '리뷰어가 작업을 거절했습니다.',
+        }),
+      });
+
+      if (res.ok) {
+        setDecliningTaskId(null);
+        setDeclineReason('');
+        fetchTasks();
+        alert('작업이 거절되었습니다.');
+      } else {
+        const data = await res.json();
+        alert(`거절 실패: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Decline error:', error);
+      alert('거절 중 오류가 발생했습니다.');
     }
   };
 
@@ -352,27 +382,38 @@ export default function ReviewerTasksPage() {
                         {task.status === 'submitted' && '제출됨'}
                         {task.status === 'approved' && '승인됨'}
                         {task.status === 'rejected' && '거부됨'}
+                        {task.status === 'declined' && '거절됨'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {(task.status === 'pending' || task.status === 'ongoing' || task.status === 'rejected') && (
-                        <button
-                          onClick={() => handleShowGuide(task)}
-                          className="text-primary-600 hover:text-primary-800"
-                        >
-                          {task.status === 'rejected' ? '재제출' : '가이드 확인'}
-                        </button>
-                      )}
-                      {task.submit_link && (
-                        <a
-                          href={task.submit_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary-600 hover:text-primary-800 ml-2"
-                        >
-                          링크
-                        </a>
-                      )}
+                      <div className="flex gap-2">
+                        {(task.status === 'pending' || task.status === 'ongoing' || task.status === 'rejected') && (
+                          <button
+                            onClick={() => handleShowGuide(task)}
+                            className="text-primary-600 hover:text-primary-800"
+                          >
+                            {task.status === 'rejected' ? '재제출' : '가이드 확인'}
+                          </button>
+                        )}
+                        {(task.status === 'pending' || task.status === 'ongoing') && (
+                          <button
+                            onClick={() => setDecliningTaskId(task.id)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            작업 거절
+                          </button>
+                        )}
+                        {task.submit_link && (
+                          <a
+                            href={task.submit_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary-600 hover:text-primary-800"
+                          >
+                            링크
+                          </a>
+                        )}
+                      </div>
                     </td>
                   </tr>
                   {task.status === 'rejected' && task.rejection_reason && (
@@ -396,6 +437,44 @@ export default function ReviewerTasksPage() {
             onPageChange={setCurrentPage}
           />
         </div>
+
+        {/* 작업 거절 모달 */}
+        {decliningTaskId && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                작업 거절
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                작업을 거절하시겠습니까? 거절 사유를 입력해주세요.
+              </p>
+              <textarea
+                value={declineReason}
+                onChange={(e) => setDeclineReason(e.target.value)}
+                placeholder="거절 사유를 입력하세요 (선택사항)"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4"
+                rows={3}
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => {
+                    setDecliningTaskId(null);
+                    setDeclineReason('');
+                  }}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleDecline}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                >
+                  거절
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

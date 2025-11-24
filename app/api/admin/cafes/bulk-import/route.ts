@@ -67,15 +67,15 @@ async function handler(req: any) {
           name = cafe_link;
         }
 
-        // 카페 등록 (중복 체크 - 링크 기준)
+        // 카페 등록 (중복 체크 - 지역별 링크 기준)
         const existing = await pool.query(
-          'SELECT id FROM cafes WHERE cafe_link = $1',
-          [cafe_link]
+          'SELECT id FROM cafes WHERE cafe_link = $1 AND region = $2',
+          [cafe_link, region || null]
         );
 
         if (existing.rows.length > 0) {
           results.failed++;
-          results.errors.push(`행 ${i + 2}: "${cafe_link}" 이미 존재합니다.`);
+          results.errors.push(`행 ${i + 2}: "${cafe_link}" 이미 존재합니다. (지역: ${region || '미지정'})`);
           continue;
         }
 

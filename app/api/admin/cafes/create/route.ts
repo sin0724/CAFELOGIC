@@ -21,6 +21,19 @@ async function handler(req: any) {
       );
     }
 
+    // 지역별 중복 체크 (같은 지역에 같은 cafe_link가 있으면 중복)
+    const duplicateCheck = await pool.query(
+      'SELECT id FROM cafes WHERE cafe_link = $1 AND region = $2',
+      [cafe_link, region || null]
+    );
+
+    if (duplicateCheck.rows.length > 0) {
+      return NextResponse.json(
+        { error: `이미 등록된 카페입니다. (지역: ${region || '미지정'})` },
+        { status: 400 }
+      );
+    }
+
     // 카페 링크에서 자동으로 이름 추출
     let name = '';
     try {
