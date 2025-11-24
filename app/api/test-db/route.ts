@@ -3,12 +3,17 @@ import pool from '@/lib/db';
 
 export async function GET() {
   try {
-    const dbUrl = process.env.DATABASE_URL;
+    // Railway에서는 DATABASE_PUBLIC_URL을 우선 사용
+    const dbUrl = process.env.DATABASE_PUBLIC_URL || process.env.DATABASE_URL;
     if (!dbUrl) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'DATABASE_URL is not configured'
+          error: 'DATABASE_URL or DATABASE_PUBLIC_URL is not configured',
+          availableEnvVars: {
+            hasDatabaseUrl: !!process.env.DATABASE_URL,
+            hasDatabasePublicUrl: !!process.env.DATABASE_PUBLIC_URL,
+          }
         },
         { status: 500 }
       );
