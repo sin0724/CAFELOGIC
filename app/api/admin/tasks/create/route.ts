@@ -19,41 +19,53 @@ async function handler(req: any) {
       comment_guide,
     } = await req.json();
 
-    if (!reviewer_id || !cafe_id || !task_type) {
+    if (!reviewer_id || !task_type) {
       return NextResponse.json(
-        { error: 'Reviewer ID, cafe ID, and task type are required' },
+        { error: 'Reviewer ID and task type are required' },
         { status: 400 }
       );
     }
 
-    // 카페 제한사항 확인
-    const cafeResult = await pool.query('SELECT * FROM cafes WHERE id = $1', [cafe_id]);
-    if (cafeResult.rows.length === 0) {
-      return NextResponse.json({ error: 'Cafe not found' }, { status: 404 });
-    }
-
-    const cafe = cafeResult.rows[0];
-
-    // 제한사항 검증
-    if (task_type === '후기' && !cafe.allow_after_post) {
+    // cafe_id 또는 cafe_link 중 하나는 필수
+    if (!cafe_id && !cafe_link) {
       return NextResponse.json(
-        { error: 'This cafe does not allow after posts' },
+        { error: 'Cafe ID or cafe link is required' },
         { status: 400 }
       );
     }
 
-    if (task_type === '리뷰' && !cafe.allow_review) {
-      return NextResponse.json(
-        { error: 'This cafe does not allow reviews' },
-        { status: 400 }
-      );
-    }
+    let cafe = null;
+    
+    // cafe_id가 있는 경우 카페 제한사항 확인
+    if (cafe_id) {
+      const cafeResult = await pool.query('SELECT * FROM cafes WHERE id = $1', [cafe_id]);
+      if (cafeResult.rows.length === 0) {
+        return NextResponse.json({ error: 'Cafe not found' }, { status: 404 });
+      }
 
-    if (business_name && !cafe.allow_business_name) {
-      return NextResponse.json(
-        { error: 'This cafe does not allow business names' },
-        { status: 400 }
-      );
+      cafe = cafeResult.rows[0];
+
+      // 제한사항 검증
+      if (task_type === '후기' && !cafe.allow_after_post) {
+        return NextResponse.json(
+          { error: 'This cafe does not allow after posts' },
+          { status: 400 }
+        );
+      }
+
+      if (task_type === '리뷰' && !cafe.allow_review) {
+        return NextResponse.json(
+          { error: 'This cafe does not allow reviews' },
+          { status: 400 }
+        );
+      }
+
+      if (business_name && !cafe.allow_business_name) {
+        return NextResponse.json(
+          { error: 'This cafe does not allow business names' },
+          { status: 400 }
+        );
+      }
     }
 
     const result = await pool.query(

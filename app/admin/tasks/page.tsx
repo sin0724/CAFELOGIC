@@ -33,6 +33,7 @@ export default function TasksPage() {
     comment_guide: '',
     deadline: '',
   });
+  const [cafeSelectionMode, setCafeSelectionMode] = useState<'list' | 'manual'>('list');
   const [formData, setFormData] = useState({
     reviewer_id: '',
     cafe_id: '',
@@ -89,15 +90,32 @@ export default function TasksPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // 카페 선택 검증
+    if (cafeSelectionMode === 'list' && !formData.cafe_id) {
+      alert('카페를 선택하거나 직접 입력 모드로 변경해주세요.');
+      return;
+    }
+    if (cafeSelectionMode === 'manual' && !formData.cafe_link) {
+      alert('카페 링크를 입력해주세요.');
+      return;
+    }
+    
     try {
+      const submitData = {
+        ...formData,
+        cafe_id: cafeSelectionMode === 'list' ? formData.cafe_id : null,
+      };
+      
       const res = await fetch('/api/admin/tasks/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (res.ok) {
         setShowForm(false);
+        setCafeSelectionMode('list');
         setFormData({
           reviewer_id: '',
           cafe_id: '',
@@ -397,38 +415,81 @@ export default function TasksPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     카페 *
                   </label>
-                  <select
-                    value={formData.cafe_id}
-                    onChange={(e) => {
-                      const selectedCafe = cafes.find(c => c.id === e.target.value);
-                      setFormData({ 
-                        ...formData, 
-                        cafe_id: e.target.value,
-                        cafe_link: selectedCafe?.cafe_link || formData.cafe_link
-                      });
-                    }}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  >
-                    <option value="">선택하세요</option>
-                    {cafes.map((c) => {
-                      let displayName = c.name;
-                      if (!displayName && c.cafe_link) {
-                        try {
-                          const url = new URL(c.cafe_link);
-                          displayName = url.pathname.split('/').filter(p => p).pop() || c.cafe_link;
-                        } catch {
-                          displayName = c.cafe_link;
+                  <div className="mb-2">
+                    <div className="flex gap-4">
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="cafeSelectionMode"
+                          value="list"
+                          checked={cafeSelectionMode === 'list'}
+                          onChange={(e) => {
+                            setCafeSelectionMode('list');
+                            setFormData({ ...formData, cafe_id: '', cafe_link: '' });
+                          }}
+                          className="mr-2"
+                        />
+                        <span className="text-sm">리스트에서 선택</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="cafeSelectionMode"
+                          value="manual"
+                          checked={cafeSelectionMode === 'manual'}
+                          onChange={(e) => {
+                            setCafeSelectionMode('manual');
+                            setFormData({ ...formData, cafe_id: '' });
+                          }}
+                          className="mr-2"
+                        />
+                        <span className="text-sm">직접 입력 (임의 작업)</span>
+                      </label>
+                    </div>
+                  </div>
+                  {cafeSelectionMode === 'list' ? (
+                    <select
+                      value={formData.cafe_id}
+                      onChange={(e) => {
+                        const selectedCafe = cafes.find(c => c.id === e.target.value);
+                        setFormData({ 
+                          ...formData, 
+                          cafe_id: e.target.value,
+                          cafe_link: selectedCafe?.cafe_link || formData.cafe_link
+                        });
+                      }}
+                      required={cafeSelectionMode === 'list'}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    >
+                      <option value="">선택하세요</option>
+                      {cafes.map((c) => {
+                        let displayName = c.name;
+                        if (!displayName && c.cafe_link) {
+                          try {
+                            const url = new URL(c.cafe_link);
+                            displayName = url.pathname.split('/').filter(p => p).pop() || c.cafe_link;
+                          } catch {
+                            displayName = c.cafe_link;
+                          }
                         }
-                      }
-                      if (!displayName) displayName = '이름 없음';
-                      return (
-                        <option key={c.id} value={c.id}>
-                          {c.region ? `[${c.region}] ` : ''}{displayName}
-                        </option>
-                      );
-                    })}
-                  </select>
+                        if (!displayName) displayName = '이름 없음';
+                        return (
+                          <option key={c.id} value={c.id}>
+                            {c.region ? `[${c.region}] ` : ''}{displayName}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={formData.cafe_link}
+                      onChange={(e) => setFormData({ ...formData, cafe_link: e.target.value })}
+                      placeholder="카페 링크를 입력하세요 (예: https://place.map.kakao.com/12345678)"
+                      required={cafeSelectionMode === 'manual'}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    />
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
