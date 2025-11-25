@@ -17,6 +17,8 @@ async function handler(req: any) {
       title_guide,
       content_guide,
       comment_guide,
+      is_region_arbitrary,
+      region_arbitrary,
     } = await req.json();
 
     if (!reviewer_id || !task_type) {
@@ -26,10 +28,18 @@ async function handler(req: any) {
       );
     }
 
-    // cafe_id 또는 cafe_link 중 하나는 필수
-    if (!cafe_id && !cafe_link) {
+    // cafe_id, cafe_link, 또는 region_arbitrary 중 하나는 필수
+    if (!cafe_id && !cafe_link && !is_region_arbitrary) {
       return NextResponse.json(
-        { error: 'Cafe ID or cafe link is required' },
+        { error: 'Cafe ID, cafe link, or region arbitrary is required' },
+        { status: 400 }
+      );
+    }
+
+    // 지역구 임의작업인 경우 region_arbitrary 필수
+    if (is_region_arbitrary && !region_arbitrary) {
+      return NextResponse.json(
+        { error: 'Region is required for region arbitrary task' },
         { status: 400 }
       );
     }
@@ -72,13 +82,14 @@ async function handler(req: any) {
       `INSERT INTO tasks (
         reviewer_id, cafe_id, task_type, deadline, cafe_link,
         business_name, place_address, need_photo, special_note,
-        title_guide, content_guide, comment_guide, status
+        title_guide, content_guide, comment_guide, status,
+        is_region_arbitrary, region_arbitrary
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending')
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending', $13, $14)
       RETURNING *`,
       [
         reviewer_id,
-        cafe_id,
+        cafe_id || null,
         task_type,
         deadline || null,
         cafe_link || null,
@@ -89,6 +100,8 @@ async function handler(req: any) {
         title_guide || null,
         content_guide || null,
         comment_guide || null,
+        is_region_arbitrary || false,
+        region_arbitrary || null,
       ]
     );
 

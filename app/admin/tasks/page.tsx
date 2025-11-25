@@ -33,7 +33,8 @@ export default function TasksPage() {
     comment_guide: '',
     deadline: '',
   });
-  const [cafeSelectionMode, setCafeSelectionMode] = useState<'list' | 'manual'>('list');
+  const [cafeSelectionMode, setCafeSelectionMode] = useState<'list' | 'manual' | 'region'>('list');
+  const [selectedRegionForArbitrary, setSelectedRegionForArbitrary] = useState<string>('');
   const [formData, setFormData] = useState({
     reviewer_id: '',
     cafe_id: '',
@@ -93,11 +94,15 @@ export default function TasksPage() {
     
     // 카페 선택 검증
     if (cafeSelectionMode === 'list' && !formData.cafe_id) {
-      alert('카페를 선택하거나 직접 입력 모드로 변경해주세요.');
+      alert('카페를 선택하거나 다른 모드로 변경해주세요.');
       return;
     }
     if (cafeSelectionMode === 'manual' && !formData.cafe_link) {
       alert('카페 링크를 입력해주세요.');
+      return;
+    }
+    if (cafeSelectionMode === 'region' && !selectedRegionForArbitrary) {
+      alert('지역구를 선택해주세요.');
       return;
     }
     
@@ -105,6 +110,8 @@ export default function TasksPage() {
       const submitData = {
         ...formData,
         cafe_id: cafeSelectionMode === 'list' ? formData.cafe_id : null,
+        is_region_arbitrary: cafeSelectionMode === 'region',
+        region_arbitrary: cafeSelectionMode === 'region' ? selectedRegionForArbitrary : null,
       };
       
       const res = await fetch('/api/admin/tasks/create', {
@@ -416,7 +423,7 @@ export default function TasksPage() {
                     카페 *
                   </label>
                   <div className="mb-2">
-                    <div className="flex gap-4">
+                    <div className="flex flex-col gap-2">
                       <label className="flex items-center cursor-pointer">
                         <input
                           type="radio"
@@ -426,10 +433,11 @@ export default function TasksPage() {
                           onChange={(e) => {
                             setCafeSelectionMode('list');
                             setFormData({ ...formData, cafe_id: '', cafe_link: '' });
+                            setSelectedRegionForArbitrary('');
                           }}
                           className="mr-2"
                         />
-                        <span className="text-sm">리스트에서 선택</span>
+                        <span className="text-sm">1. 리스트에서 선택</span>
                       </label>
                       <label className="flex items-center cursor-pointer">
                         <input
@@ -440,10 +448,25 @@ export default function TasksPage() {
                           onChange={(e) => {
                             setCafeSelectionMode('manual');
                             setFormData({ ...formData, cafe_id: '' });
+                            setSelectedRegionForArbitrary('');
                           }}
                           className="mr-2"
                         />
-                        <span className="text-sm">직접 입력 (임의 작업)</span>
+                        <span className="text-sm">2. 직접 입력 (임의 작업)</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="cafeSelectionMode"
+                          value="region"
+                          checked={cafeSelectionMode === 'region'}
+                          onChange={(e) => {
+                            setCafeSelectionMode('region');
+                            setFormData({ ...formData, cafe_id: '', cafe_link: '' });
+                          }}
+                          className="mr-2"
+                        />
+                        <span className="text-sm">3. 해당 지역구 임의작업</span>
                       </label>
                     </div>
                   </div>
@@ -480,7 +503,7 @@ export default function TasksPage() {
                         );
                       })}
                     </select>
-                  ) : (
+                  ) : cafeSelectionMode === 'manual' ? (
                     <input
                       type="text"
                       value={formData.cafe_link}
@@ -489,6 +512,20 @@ export default function TasksPage() {
                       required={cafeSelectionMode === 'manual'}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                     />
+                  ) : (
+                    <select
+                      value={selectedRegionForArbitrary}
+                      onChange={(e) => setSelectedRegionForArbitrary(e.target.value)}
+                      required={cafeSelectionMode === 'region'}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    >
+                      <option value="">지역구를 선택하세요</option>
+                      {regions.map((region) => (
+                        <option key={region} value={region}>
+                          {region}
+                        </option>
+                      ))}
+                    </select>
                   )}
                 </div>
               </div>

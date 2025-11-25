@@ -17,7 +17,7 @@ async function handler(req: any) {
       `SELECT 
         t.*,
         c.name as cafe_name,
-        c.cafe_link,
+        COALESCE(c.cafe_link, t.cafe_link) as cafe_link,
         c.allow_review,
         c.allow_business_name,
         c.allow_after_post

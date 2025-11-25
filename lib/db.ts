@@ -80,6 +80,18 @@ export async function initDatabase() {
         ) THEN
           ALTER TABLE tasks ADD COLUMN rejection_reason TEXT;
         END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'tasks' AND column_name = 'is_region_arbitrary'
+        ) THEN
+          ALTER TABLE tasks ADD COLUMN is_region_arbitrary BOOLEAN DEFAULT false;
+        END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'tasks' AND column_name = 'region_arbitrary'
+        ) THEN
+          ALTER TABLE tasks ADD COLUMN region_arbitrary TEXT;
+        END IF;
       END $$;
     `);
 

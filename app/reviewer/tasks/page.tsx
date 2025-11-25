@@ -147,6 +147,20 @@ export default function ReviewerTasksPage() {
             <h2 className="text-lg font-semibold mb-4">작업 가이드 및 제출</h2>
             
             {/* 작업 정보 */}
+            {selectedTask.is_region_arbitrary && (
+              <div className="mb-4 p-4 bg-red-50 border-2 border-red-400 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl">⚠️</span>
+                  <h3 className="text-lg font-bold text-red-800">해당 지역구 임의작업</h3>
+                </div>
+                <p className="text-sm font-semibold text-red-700 mb-1">
+                  지역구: {selectedTask.region_arbitrary}
+                </p>
+                <p className="text-sm text-red-600">
+                  이 작업은 지정된 지역구 내에서 임의의 카페를 선택하여 진행하는 작업입니다.
+                </p>
+              </div>
+            )}
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">
                 <strong>카페:</strong>{' '}
@@ -157,10 +171,12 @@ export default function ReviewerTasksPage() {
                     rel="noopener noreferrer"
                     className="text-primary-600 hover:text-primary-800 underline"
                   >
-                    {selectedTask.cafe_name}
+                    {selectedTask.cafe_name || '카페 링크'}
                   </a>
+                ) : selectedTask.is_region_arbitrary ? (
+                  <span className="text-gray-500 italic">지역구 임의작업 - 카페 선택 필요</span>
                 ) : (
-                  selectedTask.cafe_name
+                  selectedTask.cafe_name || '카페 정보 없음'
                 )}
               </p>
               <p className="text-sm text-gray-600 mb-2">
@@ -318,8 +334,12 @@ export default function ReviewerTasksPage() {
                   <>
                     <tr key={task.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {task.cafe_link ? (
+                      <div className="flex items-center flex-wrap gap-1">
+                        {task.is_region_arbitrary ? (
+                          <span className="text-sm font-bold text-red-700">
+                            ⚠️ 해당 지역구 임의작업 ({task.region_arbitrary})
+                          </span>
+                        ) : task.cafe_link ? (
                           <a
                             href={task.cafe_link}
                             target="_blank"
