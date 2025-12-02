@@ -12,7 +12,8 @@ async function handler(req: any) {
         t.*,
         r.username as reviewer_username,
         r.nickname as reviewer_nickname,
-        c.name as cafe_name
+        c.name as cafe_name,
+        COALESCE(t.business_name, c.business_name) as business_name
       FROM tasks t
       LEFT JOIN reviewers r ON t.reviewer_id = r.id
       LEFT JOIN cafes c ON t.cafe_id = c.id

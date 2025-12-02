@@ -929,6 +929,9 @@ export default function TasksPage() {
                       카페
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      상호명
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       유형
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -945,7 +948,7 @@ export default function TasksPage() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredTasks.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                         조건에 맞는 작업이 없습니다.
                       </td>
                     </tr>
@@ -958,7 +961,10 @@ export default function TasksPage() {
                     {task.reviewer_nickname || task.reviewer_username}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {task.cafe_name}
+                    {task.cafe_name || (task.is_region_arbitrary ? `[${task.region_arbitrary} 임의작업]` : '-')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                    {task.business_name || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {task.task_type}
