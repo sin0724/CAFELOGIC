@@ -353,7 +353,7 @@ export default function TasksPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="카페명, 리뷰어명 검색..."
+                placeholder="카페명, 상호명, 리뷰어명 검색..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
               />
             </div>
@@ -897,7 +897,8 @@ export default function TasksPage() {
               const query = searchQuery.toLowerCase();
               const cafeName = (task.cafe_name || '').toLowerCase();
               const reviewerName = ((task.reviewer_nickname || task.reviewer_username) || '').toLowerCase();
-              if (!cafeName.includes(query) && !reviewerName.includes(query)) {
+              const businessName = (task.business_name || '').toLowerCase();
+              if (!cafeName.includes(query) && !reviewerName.includes(query) && !businessName.includes(query)) {
                 return false;
               }
             }
