@@ -701,49 +701,66 @@ export default function TasksPage() {
         )}
 
         {/* 재분배 모달 */}
-        {reassigningTaskId && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">작업 재분배</h3>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    새로운 리뷰어 선택
-                  </label>
-                  <select
-                    value={newReviewerId}
-                    onChange={(e) => setNewReviewerId(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  >
-                    <option value="">리뷰어를 선택하세요</option>
-                    {reviewers.map((reviewer) => (
-                      <option key={reviewer.id} value={reviewer.id}>
-                        {reviewer.nickname} ({reviewer.username})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex gap-2 justify-end">
-                  <button
-                    onClick={() => {
-                      setReassigningTaskId(null);
-                      setNewReviewerId('');
-                    }}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
-                  >
-                    취소
-                  </button>
-                  <button
-                    onClick={handleReassign}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-                  >
-                    재분배
-                  </button>
+        {reassigningTaskId && (() => {
+          const currentTask = tasks.find(t => t.id === reassigningTaskId);
+          const currentReviewer = currentTask 
+            ? reviewers.find(r => r.id === currentTask.reviewer_id)
+            : null;
+          
+          return (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+              <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div className="mt-3">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">리뷰어 변경</h3>
+                  {currentReviewer && (
+                    <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-sm text-gray-600 mb-1">현재 리뷰어</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {currentReviewer.nickname} ({currentReviewer.username})
+                      </p>
+                    </div>
+                  )}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      새로운 리뷰어 선택
+                    </label>
+                    <select
+                      value={newReviewerId}
+                      onChange={(e) => setNewReviewerId(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    >
+                      <option value="">리뷰어를 선택하세요</option>
+                      {reviewers
+                        .filter(reviewer => reviewer.id !== currentTask?.reviewer_id)
+                        .map((reviewer) => (
+                          <option key={reviewer.id} value={reviewer.id}>
+                            {reviewer.nickname} ({reviewer.username})
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      onClick={() => {
+                        setReassigningTaskId(null);
+                        setNewReviewerId('');
+                      }}
+                      className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
+                    >
+                      취소
+                    </button>
+                    <button
+                      onClick={handleReassign}
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+                    >
+                      변경
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* 작업 가이드 수정 모달 */}
         {editingTaskId && (
@@ -1021,15 +1038,16 @@ export default function TasksPage() {
                           </button>
                         </>
                       )}
-                      {task.status === 'declined' && (
+                      {/* approved 상태를 제외한 모든 상태에서 리뷰어 변경 가능 */}
+                      {task.status !== 'approved' && (
                         <button
                           onClick={() => {
                             setReassigningTaskId(task.id);
                             setNewReviewerId('');
                           }}
-                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
+                          className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm"
                         >
-                          재분배
+                          리뷰어 변경
                         </button>
                       )}
                       {task.submit_link && (
