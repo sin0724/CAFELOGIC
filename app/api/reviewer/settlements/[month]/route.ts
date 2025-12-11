@@ -2,11 +2,14 @@ import { NextResponse } from 'next/server';
 import { withReviewer } from '@/lib/middleware';
 import pool from '@/lib/db';
 
-async function handler(req: any, context: { params: Promise<{ month: string }> | { month: string } }) {
+async function handler(req: any) {
   try {
     const reviewerId = req.user?.userId;
-    const params = await Promise.resolve(context.params);
-    const month = params.month;
+    
+    // URL에서 month 파라미터 추출
+    const url = new URL(req.url);
+    const pathParts = url.pathname.split('/');
+    const month = pathParts[pathParts.length - 1];
 
     if (!reviewerId) {
       return NextResponse.json(
