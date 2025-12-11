@@ -49,50 +49,50 @@ export default function ReviewerDashboard() {
 
   return (
     <Layout role="reviewer">
-      <div className="px-4 py-6 sm:px-0">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">리뷰어 대시보드</h1>
+      <div className="px-2 sm:px-4 py-4 sm:py-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">리뷰어 대시보드</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">대기 중인 작업</h3>
-            <p className="text-3xl font-bold text-gray-900">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white shadow rounded-lg p-3 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-medium text-gray-500 mb-1 sm:mb-2">대기 중인 작업</h3>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               {tasks.filter((t) => t.status === 'pending').length}
             </p>
           </div>
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">진행 중인 작업</h3>
-            <p className="text-3xl font-bold text-blue-600">
+          <div className="bg-white shadow rounded-lg p-3 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-medium text-gray-500 mb-1 sm:mb-2">진행 중인 작업</h3>
+            <p className="text-2xl sm:text-3xl font-bold text-blue-600">
               {tasks.filter((t) => t.status === 'ongoing').length}
             </p>
           </div>
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">거부된 작업</h3>
-            <p className="text-3xl font-bold text-red-600">
+          <div className="bg-white shadow rounded-lg p-3 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-medium text-gray-500 mb-1 sm:mb-2">거부된 작업</h3>
+            <p className="text-2xl sm:text-3xl font-bold text-red-600">
               {tasks.filter((t) => t.status === 'rejected').length}
             </p>
           </div>
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">승인된 작업</h3>
-            <p className="text-3xl font-bold text-green-600">
+          <div className="bg-white shadow rounded-lg p-3 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-medium text-gray-500 mb-1 sm:mb-2">승인된 작업</h3>
+            <p className="text-2xl sm:text-3xl font-bold text-green-600">
               {tasks.filter((t) => t.status === 'approved').length}
             </p>
           </div>
         </div>
 
         {todayTasks.length > 0 && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-            <h2 className="text-lg font-semibold text-yellow-800 mb-2">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-yellow-800 mb-2">
               ⚠️ 마감 임박 작업 ({todayTasks.length}개)
             </h2>
             <div className="space-y-2">
               {todayTasks.slice(0, 5).map((task) => {
                 const days = getDaysUntilDeadline(task.deadline);
                 return (
-                  <div key={task.id} className="flex justify-between items-center">
-                    <span className="text-sm text-gray-700">
+                  <div key={task.id} className="flex justify-between items-center gap-2">
+                    <span className="text-xs sm:text-sm text-gray-700 truncate flex-1">
                       {task.cafe_name} - {task.task_type}
                     </span>
-                    <span className="text-sm font-medium text-yellow-800">
+                    <span className="text-xs sm:text-sm font-medium text-yellow-800 whitespace-nowrap">
                       D-{days}
                     </span>
                   </div>
@@ -102,36 +102,36 @@ export default function ReviewerDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* 대기 중인 작업 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">대기 중인 작업</h2>
+          <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900">대기 중인 작업</h2>
               <Link
                 href="/reviewer/tasks"
-                className="text-primary-600 hover:text-primary-800 text-sm font-medium"
+                className="text-primary-600 hover:text-primary-800 text-xs sm:text-sm font-medium whitespace-nowrap"
               >
                 전체 보기 →
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {tasks.filter((t) => t.status === 'pending').slice(0, 5).map((task) => {
                 const days = getDaysUntilDeadline(task.deadline);
                 return (
                   <div
                     key={task.id}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-2 sm:p-3 bg-gray-50 rounded-lg"
                   >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{task.cafe_name}</span>
-                        <span className="text-sm text-gray-500">({task.task_type})</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                        <span className="text-sm sm:text-base font-medium text-gray-900 truncate">{task.cafe_name}</span>
+                        <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">({task.task_type})</span>
                       </div>
                       {task.business_name && (
-                        <span className="text-sm text-gray-600">상호명: {task.business_name}</span>
+                        <span className="text-xs sm:text-sm text-gray-600 block truncate">상호명: {task.business_name}</span>
                       )}
                       {task.deadline && (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-xs sm:text-sm text-gray-500 block">
                           마감: {new Date(task.deadline).toLocaleDateString('ko-KR')}
                           {days !== null && days <= 3 && (
                             <span className="ml-2 text-yellow-600 font-medium">(D-{days})</span>
@@ -139,7 +139,7 @@ export default function ReviewerDashboard() {
                         </span>
                       )}
                     </div>
-                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                    <span className="px-2 sm:px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 whitespace-nowrap self-start sm:self-auto">
                       대기 중
                     </span>
                   </div>
@@ -152,34 +152,34 @@ export default function ReviewerDashboard() {
           </div>
 
           {/* 진행 중인 작업 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">진행 중인 작업</h2>
+          <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900">진행 중인 작업</h2>
               <Link
                 href="/reviewer/tasks"
-                className="text-primary-600 hover:text-primary-800 text-sm font-medium"
+                className="text-primary-600 hover:text-primary-800 text-xs sm:text-sm font-medium whitespace-nowrap"
               >
                 전체 보기 →
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {tasks.filter((t) => t.status === 'ongoing').slice(0, 5).map((task) => {
                 const days = getDaysUntilDeadline(task.deadline);
                 return (
                   <div
                     key={task.id}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-2 sm:p-3 bg-gray-50 rounded-lg"
                   >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{task.cafe_name}</span>
-                        <span className="text-sm text-gray-500">({task.task_type})</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                        <span className="text-sm sm:text-base font-medium text-gray-900 truncate">{task.cafe_name}</span>
+                        <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">({task.task_type})</span>
                       </div>
                       {task.business_name && (
-                        <span className="text-sm text-gray-600">상호명: {task.business_name}</span>
+                        <span className="text-xs sm:text-sm text-gray-600 block truncate">상호명: {task.business_name}</span>
                       )}
                       {task.deadline && (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-xs sm:text-sm text-gray-500 block">
                           마감: {new Date(task.deadline).toLocaleDateString('ko-KR')}
                           {days !== null && days <= 3 && (
                             <span className="ml-2 text-yellow-600 font-medium">(D-{days})</span>
@@ -187,7 +187,7 @@ export default function ReviewerDashboard() {
                         </span>
                       )}
                     </div>
-                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                    <span className="px-2 sm:px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 whitespace-nowrap self-start sm:self-auto">
                       진행 중
                     </span>
                   </div>
@@ -200,35 +200,35 @@ export default function ReviewerDashboard() {
           </div>
 
           {/* 거부된 작업 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">거부된 작업</h2>
+          <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900">거부된 작업</h2>
               <Link
                 href="/reviewer/tasks"
-                className="text-primary-600 hover:text-primary-800 text-sm font-medium"
+                className="text-primary-600 hover:text-primary-800 text-xs sm:text-sm font-medium whitespace-nowrap"
               >
                 전체 보기 →
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {tasks.filter((t) => t.status === 'rejected').slice(0, 5).map((task) => (
                 <div
                   key={task.id}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-2 sm:p-3 bg-gray-50 rounded-lg"
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900">{task.cafe_name}</span>
-                      <span className="text-sm text-gray-500">({task.task_type})</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                      <span className="text-sm sm:text-base font-medium text-gray-900 truncate">{task.cafe_name}</span>
+                      <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">({task.task_type})</span>
                     </div>
                     {task.business_name && (
-                      <span className="text-sm text-gray-600">상호명: {task.business_name}</span>
+                      <span className="text-xs sm:text-sm text-gray-600 block truncate">상호명: {task.business_name}</span>
                     )}
                     {task.rejection_reason && (
-                      <p className="text-xs text-red-600 mt-1">{task.rejection_reason}</p>
+                      <p className="text-xs text-red-600 mt-1 line-clamp-2">{task.rejection_reason}</p>
                     )}
                   </div>
-                  <span className="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                  <span className="px-2 sm:px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 whitespace-nowrap self-start sm:self-auto">
                     거부됨
                   </span>
                 </div>
@@ -240,37 +240,37 @@ export default function ReviewerDashboard() {
           </div>
 
           {/* 승인된 작업 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">승인된 작업</h2>
+          <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900">승인된 작업</h2>
               <Link
                 href="/reviewer/tasks"
-                className="text-primary-600 hover:text-primary-800 text-sm font-medium"
+                className="text-primary-600 hover:text-primary-800 text-xs sm:text-sm font-medium whitespace-nowrap"
               >
                 전체 보기 →
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {tasks.filter((t) => t.status === 'approved').slice(0, 5).map((task) => (
                 <div
                   key={task.id}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-2 sm:p-3 bg-gray-50 rounded-lg"
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900">{task.cafe_name}</span>
-                      <span className="text-sm text-gray-500">({task.task_type})</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                      <span className="text-sm sm:text-base font-medium text-gray-900 truncate">{task.cafe_name}</span>
+                      <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">({task.task_type})</span>
                     </div>
                     {task.business_name && (
-                      <span className="text-sm text-gray-600">상호명: {task.business_name}</span>
+                      <span className="text-xs sm:text-sm text-gray-600 block truncate">상호명: {task.business_name}</span>
                     )}
                     {task.settlement_amount && (
-                      <span className="text-sm text-green-600 font-medium">
+                      <span className="text-xs sm:text-sm text-green-600 font-medium block">
                         +{task.settlement_amount.toLocaleString()}원
                       </span>
                     )}
                   </div>
-                  <span className="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                  <span className="px-2 sm:px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 whitespace-nowrap self-start sm:self-auto">
                     승인됨
                   </span>
                 </div>
