@@ -71,8 +71,14 @@ export default function ReviewerMyPage() {
           </div>
         </div>
 
-        <div className="bg-white shadow rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">이번달 정산 예정금액</h2>
+        <a
+          href={`/reviewer/settlements?month=${summary?.monthlySettlement?.month || new Date().toISOString().slice(0, 7)}`}
+          className="block bg-white shadow rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 hover:shadow-md transition-shadow cursor-pointer"
+        >
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">이번달 정산 예정금액</h2>
+            <span className="text-xs sm:text-sm text-gray-400">상세보기 →</span>
+          </div>
           <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
             <p className="text-2xl sm:text-3xl font-bold text-primary-600">
               {summary?.monthlySettlement?.amount?.toLocaleString() || 0}원
@@ -89,7 +95,7 @@ export default function ReviewerMyPage() {
               <strong>유의사항:</strong> 매월 1일부터 말일까지의 작업건은 익월 10일에 정산됩니다.
             </p>
           </div>
-        </div>
+        </a>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-white shadow rounded-lg p-4 sm:p-6">
@@ -97,9 +103,10 @@ export default function ReviewerMyPage() {
             {summary?.settlements && summary.settlements.length > 0 ? (
               <div className="space-y-2 sm:space-y-3">
                 {summary.settlements.map((settlement: any, index: number) => (
-                  <div
+                  <a
                     key={index}
-                    className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 p-2 sm:p-3 bg-gray-50 rounded-lg"
+                    href={`/reviewer/settlements?month=${settlement.month}`}
+                    className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 p-2 sm:p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <div className="flex-1">
                       <p className="text-sm sm:text-base font-medium text-gray-900">{settlement.month}</p>
@@ -107,10 +114,13 @@ export default function ReviewerMyPage() {
                         {settlement.task_count}개 작업
                       </p>
                     </div>
-                    <p className="text-base sm:text-lg font-bold text-primary-600">
-                      {settlement.total_amount?.toLocaleString()}원
-                    </p>
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-base sm:text-lg font-bold text-primary-600">
+                        {settlement.total_amount?.toLocaleString()}원
+                      </p>
+                      <span className="text-xs text-gray-400">→</span>
+                    </div>
+                  </a>
                 ))}
               </div>
             ) : (
