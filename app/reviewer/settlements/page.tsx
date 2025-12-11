@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Layout from '@/components/Layout';
 import Link from 'next/link';
 
-export default function ReviewerSettlementsPage() {
+function SettlementsContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const month = searchParams.get('month') || new Date().toISOString().slice(0, 7);
   
   const [settlement, setSettlement] = useState<any>(null);
@@ -259,5 +258,19 @@ export default function ReviewerSettlementsPage() {
         </div>
       </div>
     </Layout>
+  );
+}
+
+export default function ReviewerSettlementsPage() {
+  return (
+    <Suspense fallback={
+      <Layout role="reviewer">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-gray-500">로딩 중...</div>
+        </div>
+      </Layout>
+    }>
+      <SettlementsContent />
+    </Suspense>
   );
 }
