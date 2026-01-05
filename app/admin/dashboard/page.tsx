@@ -68,7 +68,7 @@ export default function AdminDashboard() {
             href="/admin/tasks"
           />
           <StatCard
-            title="승인 대기"
+            title="관리자 승인 대기"
             value={stats?.submitted || 0}
             color="yellow"
             href="/admin/tasks?status=submitted"
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
             <div className="space-y-3">
               <StatusItem label="대기 중" count={stats?.pending || 0} color="gray" />
               <StatusItem label="진행 중" count={stats?.ongoing || 0} color="blue" />
-              <StatusItem label="제출됨" count={stats?.submitted || 0} color="yellow" />
+              <StatusItem label="관리자 승인 대기" count={stats?.submitted || 0} color="yellow" />
               <StatusItem label="승인됨" count={stats?.approved || 0} color="green" />
               <StatusItem label="거부됨" count={stats?.rejected || 0} color="red" />
             </div>

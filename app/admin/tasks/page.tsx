@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Layout from '@/components/Layout';
 import Pagination from '@/components/Pagination';
 
 export default function TasksPage() {
+  const searchParams = useSearchParams();
   const [tasks, setTasks] = useState<any[]>([]);
   const [reviewers, setReviewers] = useState<any[]>([]);
   const [cafes, setCafes] = useState<any[]>([]);
@@ -14,7 +16,7 @@ export default function TasksPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [rejectingTaskId, setRejectingTaskId] = useState<string | null>(null);

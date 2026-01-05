@@ -46,6 +46,9 @@ async function handler(req: any) {
     }
 
     // 작업 정보 업데이트
+    // deadline은 빈 문자열이면 null로 설정하고, 값이 있으면 그 값을 사용
+    const deadlineValue = deadline === '' ? null : deadline;
+    
     const result = await pool.query(
       `UPDATE tasks 
        SET cafe_link = COALESCE($1, cafe_link),
@@ -56,7 +59,7 @@ async function handler(req: any) {
            title_guide = COALESCE($6, title_guide),
            content_guide = COALESCE($7, content_guide),
            comment_guide = COALESCE($8, comment_guide),
-           deadline = COALESCE($9, deadline)
+           deadline = $9
        WHERE id = $10
        RETURNING *`,
       [
@@ -68,7 +71,7 @@ async function handler(req: any) {
         title_guide || null,
         content_guide || null,
         comment_guide || null,
-        deadline || null,
+        deadlineValue,
         task_id,
       ]
     );
