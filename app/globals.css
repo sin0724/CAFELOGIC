@@ -14,6 +14,28 @@
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
+  
+  /* 다크 모드에서도 입력 필드는 항상 밝은 배경과 검은색 텍스트 유지 */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="url"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="time"],
+  select,
+  textarea {
+    color: #111827 !important; /* text-gray-900 */
+    background-color: #ffffff !important;
+  }
+  
+  input::placeholder,
+  textarea::placeholder {
+    color: #9ca3af !important; /* text-gray-400 */
+  }
 }
 
 body {
@@ -24,5 +46,27 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+/* 입력 필드 텍스트 색상 고정 - 다크 모드에서도 항상 검은색 텍스트 */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="time"],
+select,
+textarea {
+  color: #111827 !important; /* text-gray-900 */
+  background-color: #ffffff !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important; /* text-gray-400 */
 }
 
