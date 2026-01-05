@@ -46,8 +46,24 @@ async function handler(req: any) {
     }
 
     // 작업 정보 업데이트
-    // deadline은 빈 문자열이면 null로 설정하고, 값이 있으면 그 값을 사용
-    const deadlineValue = deadline === '' ? null : deadline;
+    // deadline은 undefined이거나 빈 문자열이면 null로 설정하고, 값이 있으면 그 값을 사용
+    // 날짜 형식이 올바른지 확인 (YYYY-MM-DD 형식)
+    let deadlineValue: string | null = null;
+    if (deadline !== undefined && deadline !== null && deadline !== '') {
+      // 날짜 형식 검증 (YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (dateRegex.test(deadline)) {
+        deadlineValue = deadline;
+      } else {
+        // 형식이 맞지 않으면 에러 반환
+        return NextResponse.json(
+          { error: 'Invalid deadline format. Expected YYYY-MM-DD' },
+          { status: 400 }
+        );
+      }
+    }
+    
+    console.log('Updating task:', { task_id, deadline, deadlineValue });
     
     const result = await pool.query(
       `UPDATE tasks 
@@ -76,6 +92,8 @@ async function handler(req: any) {
       ]
     );
 
+    console.log('Task updated successfully:', { task_id, updated_deadline: result.rows[0]?.deadline });
+    
     return NextResponse.json({ success: true, task: result.rows[0] });
   } catch (error: any) {
     console.error('Update task error:', error);
