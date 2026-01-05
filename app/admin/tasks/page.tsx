@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Layout from '@/components/Layout';
 import Pagination from '@/components/Pagination';
 
-export default function TasksPage() {
+function TasksPageContent() {
   const searchParams = useSearchParams();
   const [tasks, setTasks] = useState<any[]>([]);
   const [reviewers, setReviewers] = useState<any[]>([]);
@@ -1084,3 +1084,16 @@ export default function TasksPage() {
   );
 }
 
+export default function TasksPage() {
+  return (
+    <Suspense fallback={
+      <Layout role="admin">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-gray-500">로딩 중...</div>
+        </div>
+      </Layout>
+    }>
+      <TasksPageContent />
+    </Suspense>
+  );
+}
