@@ -25,6 +25,7 @@ function TasksPageContent() {
   const [newReviewerId, setNewReviewerId] = useState('');
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState({
+    task_type: '',
     cafe_link: '',
     business_name: '',
     place_address: '',
@@ -236,6 +237,7 @@ function TasksPageContent() {
   const handleEditTask = (task: any) => {
     setEditingTaskId(task.id);
     setEditFormData({
+      task_type: task.task_type || '',
       cafe_link: task.cafe_link || '',
       business_name: task.business_name || '',
       place_address: task.place_address || '',
@@ -264,6 +266,7 @@ function TasksPageContent() {
       if (res.ok) {
         setEditingTaskId(null);
         setEditFormData({
+          task_type: '',
           cafe_link: '',
           business_name: '',
           place_address: '',
@@ -771,6 +774,22 @@ function TasksPageContent() {
               <div className="mt-3">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">작업 가이드 수정</h3>
                 <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      작업 유형 *
+                    </label>
+                    <select
+                      value={editFormData.task_type}
+                      onChange={(e) => setEditFormData({ ...editFormData, task_type: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900"
+                      required
+                    >
+                      <option value="질문">질문</option>
+                      <option value="후기">후기</option>
+                      <option value="댓글">댓글</option>
+                      <option value="정보">정보</option>
+                    </select>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       카페 링크

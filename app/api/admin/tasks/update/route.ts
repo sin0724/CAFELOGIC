@@ -6,6 +6,7 @@ async function handler(req: any) {
   try {
     const {
       task_id,
+      task_type,
       cafe_link,
       business_name,
       place_address,
@@ -67,18 +68,20 @@ async function handler(req: any) {
     
     const result = await pool.query(
       `UPDATE tasks 
-       SET cafe_link = COALESCE($1, cafe_link),
-           business_name = COALESCE($2, business_name),
-           place_address = COALESCE($3, place_address),
-           need_photo = COALESCE($4, need_photo),
-           special_note = COALESCE($5, special_note),
-           title_guide = COALESCE($6, title_guide),
-           content_guide = COALESCE($7, content_guide),
-           comment_guide = COALESCE($8, comment_guide),
-           deadline = $9
-       WHERE id = $10
+       SET task_type = COALESCE($1, task_type),
+           cafe_link = COALESCE($2, cafe_link),
+           business_name = COALESCE($3, business_name),
+           place_address = COALESCE($4, place_address),
+           need_photo = COALESCE($5, need_photo),
+           special_note = COALESCE($6, special_note),
+           title_guide = COALESCE($7, title_guide),
+           content_guide = COALESCE($8, content_guide),
+           comment_guide = COALESCE($9, comment_guide),
+           deadline = $10
+       WHERE id = $11
        RETURNING *`,
       [
+        task_type || null,
         cafe_link || null,
         business_name || null,
         place_address || null,
