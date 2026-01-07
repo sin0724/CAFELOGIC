@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Layout from '@/components/Layout';
 import Pagination from '@/components/Pagination';
-import { differenceInDays, parseISO } from 'date-fns';
 
 export default function ReviewerTasksPage() {
   const [tasks, setTasks] = useState<any[]>([]);
@@ -121,9 +120,24 @@ export default function ReviewerTasksPage() {
     }
   };
 
+  // 날짜 문자열을 한국 시간대로 올바르게 파싱하는 함수
+  const parseDeadlineDate = (deadline: string | null): Date | null => {
+    if (!deadline) return null;
+    // YYYY-MM-DD 형식의 날짜 문자열을 로컬 시간대로 파싱
+    // 타임존 문제를 방지하기 위해 날짜 부분만 추출하여 로컬 시간으로 생성
+    const dateStr = deadline.split('T')[0]; // 시간 부분 제거
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day); // 월은 0부터 시작하므로 -1
+  };
+
   const getDaysUntilDeadline = (deadline: string | null) => {
     if (!deadline) return null;
-    const days = differenceInDays(parseISO(deadline), new Date());
+    const deadlineDate = parseDeadlineDate(deadline);
+    if (!deadlineDate) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // 오늘 날짜만 비교
+    deadlineDate.setHours(0, 0, 0, 0);
+    const days = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     return days;
   };
 
@@ -184,7 +198,7 @@ export default function ReviewerTasksPage() {
               </p>
               {selectedTask.deadline && (
                 <p className="text-xs sm:text-sm text-gray-600">
-                  <strong>마감일:</strong> {new Date(selectedTask.deadline).toLocaleDateString('ko-KR')}
+                  <strong>마감일:</strong> {parseDeadlineDate(selectedTask.deadline)?.toLocaleDateString('ko-KR') || '-'}
                 </p>
               )}
               {selectedTask.business_name && (
@@ -375,7 +389,7 @@ export default function ReviewerTasksPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {task.deadline ? (
                         <div>
-                          {new Date(task.deadline).toLocaleDateString('ko-KR')}
+                          {parseDeadlineDate(task.deadline)?.toLocaleDateString('ko-KR') || '-'}
                           {days !== null && days <= 3 && days >= 0 && (
                             <span className="ml-2 text-yellow-600 font-medium">(D-{days})</span>
                           )}
@@ -531,7 +545,7 @@ export default function ReviewerTasksPage() {
                       <span className="font-medium">마감일:</span>{' '}
                       {task.deadline ? (
                         <>
-                          {new Date(task.deadline).toLocaleDateString('ko-KR')}
+                          {parseDeadlineDate(task.deadline)?.toLocaleDateString('ko-KR') || '-'}
                           {days !== null && days <= 3 && days >= 0 && (
                             <span className="ml-2 text-yellow-600 font-medium">(D-{days})</span>
                           )}
