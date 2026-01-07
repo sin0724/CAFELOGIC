@@ -439,7 +439,7 @@ function TasksPageContent() {
                           }}
                           className="mr-2"
                         />
-                        <span className="text-sm">1. 리스트에서 선택</span>
+                        <span className="text-sm text-gray-900">1. 리스트에서 선택</span>
                       </label>
                       <label className="flex items-center cursor-pointer">
                         <input
@@ -454,7 +454,7 @@ function TasksPageContent() {
                           }}
                           className="mr-2"
                         />
-                        <span className="text-sm">2. 직접 입력 (임의 작업)</span>
+                        <span className="text-sm text-gray-900">2. 직접 입력 (임의 작업)</span>
                       </label>
                       <label className="flex items-center cursor-pointer">
                         <input
@@ -468,7 +468,7 @@ function TasksPageContent() {
                           }}
                           className="mr-2"
                         />
-                        <span className="text-sm">3. 해당 지역구 임의작업</span>
+                        <span className="text-sm text-gray-900">3. 해당 지역구 임의작업</span>
                       </label>
                     </div>
                   </div>
