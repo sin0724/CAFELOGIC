@@ -895,6 +895,7 @@ function TasksPageContent() {
                     onClick={() => {
                       setEditingTaskId(null);
                       setEditFormData({
+                        task_type: '',
                         cafe_link: '',
                         business_name: '',
                         place_address: '',
