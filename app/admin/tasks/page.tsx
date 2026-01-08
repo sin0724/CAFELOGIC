@@ -345,7 +345,7 @@ function TasksPageContent() {
                 <option value="">전체 리뷰어</option>
                 {reviewers.map((reviewer) => (
                   <option key={reviewer.id} value={reviewer.id}>
-                    {reviewer.nickname} ({reviewer.username})
+                    {reviewer.nickname} ({reviewer.username}) - {reviewer.task_count || 0}건
                   </option>
                 ))}
               </select>
@@ -418,7 +418,7 @@ function TasksPageContent() {
                     <option value="">선택하세요</option>
                     {reviewers.map((r) => (
                       <option key={r.id} value={r.id}>
-                        {r.nickname} ({r.username})
+                        {r.nickname} ({r.username}) - {r.task_count || 0}건
                       </option>
                     ))}
                   </select>
@@ -739,7 +739,7 @@ function TasksPageContent() {
                         .filter(reviewer => reviewer.id !== currentTask?.reviewer_id)
                         .map((reviewer) => (
                           <option key={reviewer.id} value={reviewer.id}>
-                            {reviewer.nickname} ({reviewer.username})
+                            {reviewer.nickname} ({reviewer.username}) - {reviewer.task_count || 0}건
                           </option>
                         ))}
                     </select>

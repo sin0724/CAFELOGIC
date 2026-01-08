@@ -5,9 +5,17 @@ import pool from '@/lib/db';
 async function handler() {
   try {
     const result = await pool.query(
-      `SELECT id, username, nickname, unit_price, created_at
-       FROM reviewers
-       ORDER BY created_at DESC`
+      `SELECT 
+        r.id, 
+        r.username, 
+        r.nickname, 
+        r.unit_price, 
+        r.created_at,
+        COUNT(t.id) as task_count
+      FROM reviewers r
+      LEFT JOIN tasks t ON r.id = t.reviewer_id
+      GROUP BY r.id, r.username, r.nickname, r.unit_price, r.created_at
+      ORDER BY r.created_at DESC`
     );
 
     return NextResponse.json({ reviewers: result.rows });

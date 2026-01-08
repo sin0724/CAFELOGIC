@@ -34,6 +34,20 @@ export default function ReviewerTasksPage() {
     e.preventDefault();
     if (!selectedTask || !submitLink) return;
 
+    // 기존 링크가 있는 경우 확인
+    if (selectedTask.submit_link && selectedTask.submit_link.trim() !== '') {
+      if (selectedTask.submit_link.trim() !== submitLink.trim()) {
+        const confirmMessage = `이미 제출 링크가 등록되어 있습니다.\n\n기존 링크: ${selectedTask.submit_link}\n새 링크: ${submitLink}\n\n기존 링크를 덮어쓰시겠습니까?`;
+        if (!confirm(confirmMessage)) {
+          return; // 사용자가 취소하면 제출하지 않음
+        }
+      } else {
+        // 같은 링크면 그냥 성공 처리
+        alert('이미 동일한 링크가 등록되어 있습니다.');
+        return;
+      }
+    }
+
     try {
       const res = await fetch('/api/reviewer/tasks/submit', {
         method: 'POST',
@@ -45,9 +59,15 @@ export default function ReviewerTasksPage() {
       });
 
       if (res.ok) {
+        const data = await res.json();
         setSelectedTask(null);
         setSubmitLink('');
         fetchTasks();
+        if (data.message) {
+          alert(data.message);
+        } else {
+          alert('제출이 완료되었습니다.');
+        }
       } else {
         const data = await res.json();
         const errorMessage = data.message || data.error || 'Failed to submit task';
