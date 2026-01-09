@@ -24,6 +24,7 @@ function TasksPageContent() {
   const [reassigningTaskId, setReassigningTaskId] = useState<string | null>(null);
   const [newReviewerId, setNewReviewerId] = useState('');
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [viewingTaskId, setViewingTaskId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState({
     task_type: '',
     cafe_link: '',
@@ -767,6 +768,119 @@ function TasksPageContent() {
           );
         })()}
 
+        {/* 작업 가이드 보기 모달 (읽기 전용) */}
+        {viewingTaskId && (() => {
+          const viewingTask = tasks.find(t => t.id === viewingTaskId);
+          if (!viewingTask) return null;
+          
+          return (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+              <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white mb-10">
+                <div className="mt-3">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">작업 가이드 확인</h3>
+                  <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        작업 유형
+                      </label>
+                      <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900">
+                        {viewingTask.task_type || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        카페 링크
+                      </label>
+                      <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 break-all">
+                        {viewingTask.cafe_link ? (
+                          <a href={viewingTask.cafe_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                            {viewingTask.cafe_link}
+                          </a>
+                        ) : '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        사업자명
+                      </label>
+                      <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900">
+                        {viewingTask.business_name || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        주소
+                      </label>
+                      <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900">
+                        {viewingTask.place_address || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        마감일
+                      </label>
+                      <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900">
+                        {viewingTask.deadline ? new Date(viewingTask.deadline).toLocaleDateString('ko-KR') : '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={viewingTask.need_photo || false}
+                          disabled
+                          className="mr-2"
+                        />
+                        <span className="text-sm text-gray-700">사진 필요</span>
+                      </label>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        특이사항
+                      </label>
+                      <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 whitespace-pre-wrap min-h-[60px]">
+                        {viewingTask.special_note || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        제목 가이드
+                      </label>
+                      <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 whitespace-pre-wrap min-h-[60px]">
+                        {viewingTask.title_guide || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        내용 가이드
+                      </label>
+                      <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 whitespace-pre-wrap min-h-[100px]">
+                        {viewingTask.content_guide || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        댓글 가이드
+                      </label>
+                      <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 whitespace-pre-wrap min-h-[100px]">
+                        {viewingTask.comment_guide || '-'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 justify-end mt-6">
+                    <button
+                      onClick={() => setViewingTaskId(null)}
+                      className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
+                    >
+                      닫기
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* 작업 가이드 수정 모달 */}
         {editingTaskId && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
@@ -1059,6 +1173,15 @@ function TasksPageContent() {
                             거부
                           </button>
                         </>
+                      )}
+                      {/* 승인된 작업건에도 가이드 보기 버튼 추가 */}
+                      {task.status === 'approved' && (
+                        <button
+                          onClick={() => setViewingTaskId(task.id)}
+                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
+                        >
+                          가이드 보기
+                        </button>
                       )}
                       {/* approved 상태를 제외한 모든 상태에서 리뷰어 변경 가능 */}
                       {task.status !== 'approved' && (
