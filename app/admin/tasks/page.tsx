@@ -39,16 +39,28 @@ function TasksPageContent() {
   });
   const [cafeSelectionMode, setCafeSelectionMode] = useState<'list' | 'manual' | 'region'>('list');
   const [selectedRegionForArbitrary, setSelectedRegionForArbitrary] = useState<string>('');
+  
+  // 기본 특이사항 텍스트
+  const DEFAULT_SPECIAL_NOTE = '상호 언급 가능하면 언급\n불가면 언급x, 쪽지유도';
+  
+  // 마감일 자동 계산 함수 (신청일 기준 +21일)
+  const getDefaultDeadline = () => {
+    const today = new Date();
+    const deadline = new Date(today);
+    deadline.setDate(today.getDate() + 21);
+    return deadline.toISOString().split('T')[0];
+  };
+  
   const [formData, setFormData] = useState({
     reviewer_id: '',
     cafe_id: '',
     task_type: '질문',
-    deadline: '',
+    deadline: getDefaultDeadline(),
     cafe_link: '',
     business_name: '',
     place_address: '',
     need_photo: false,
-    special_note: '',
+    special_note: DEFAULT_SPECIAL_NOTE,
     title_guide: '',
     content_guide: '',
     comment_guide: '',
@@ -131,12 +143,12 @@ function TasksPageContent() {
           reviewer_id: '',
           cafe_id: '',
           task_type: '질문',
-          deadline: '',
+          deadline: getDefaultDeadline(),
           cafe_link: '',
           business_name: '',
           place_address: '',
           need_photo: false,
-          special_note: '',
+          special_note: DEFAULT_SPECIAL_NOTE,
           title_guide: '',
           content_guide: '',
           comment_guide: '',
@@ -306,7 +318,28 @@ function TasksPageContent() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">작업 관리</h1>
           <button
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => {
+              if (!showForm) {
+                // 폼을 열 때 기본값 설정
+                setFormData({
+                  reviewer_id: '',
+                  cafe_id: '',
+                  task_type: '질문',
+                  deadline: getDefaultDeadline(),
+                  cafe_link: '',
+                  business_name: '',
+                  place_address: '',
+                  need_photo: false,
+                  special_note: DEFAULT_SPECIAL_NOTE,
+                  title_guide: '',
+                  content_guide: '',
+                  comment_guide: '',
+                });
+                setCafeSelectionMode('list');
+                setSelectedRegionForArbitrary('');
+              }
+              setShowForm(!showForm);
+            }}
             className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg"
           >
             {showForm ? '취소' : '+ 작업 생성'}
@@ -555,13 +588,26 @@ function TasksPageContent() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     마감일
+                    {formData.special_note === DEFAULT_SPECIAL_NOTE && (
+                      <span className="ml-2 text-xs text-gray-500">(자동: 신청일 +21일)</span>
+                    )}
                   </label>
                   <input
                     type="date"
                     value={formData.deadline}
                     onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    disabled={formData.special_note === DEFAULT_SPECIAL_NOTE}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${
+                      formData.special_note === DEFAULT_SPECIAL_NOTE 
+                        ? 'bg-gray-100 cursor-not-allowed' 
+                        : ''
+                    }`}
                   />
+                  {formData.special_note === DEFAULT_SPECIAL_NOTE && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      특이사항을 수정하면 마감일을 수동으로 변경할 수 있습니다.
+                    </p>
+                  )}
                 </div>
               </div>
               <div>
@@ -616,7 +662,19 @@ function TasksPageContent() {
                 </label>
                 <textarea
                   value={formData.special_note}
-                  onChange={(e) => setFormData({ ...formData, special_note: e.target.value })}
+                  onChange={(e) => {
+                    const newSpecialNote = e.target.value;
+                    // 특이사항이 기본값으로 돌아가면 마감일도 자동으로 재설정
+                    if (newSpecialNote === DEFAULT_SPECIAL_NOTE) {
+                      setFormData({ 
+                        ...formData, 
+                        special_note: newSpecialNote,
+                        deadline: getDefaultDeadline()
+                      });
+                    } else {
+                      setFormData({ ...formData, special_note: newSpecialNote });
+                    }
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                   rows={2}
                 />
