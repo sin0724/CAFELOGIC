@@ -1185,26 +1185,37 @@ function TasksPageContent() {
                     {task.deadline ? new Date(task.deadline).toLocaleDateString('ko-KR') : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        task.status === 'approved'
-                          ? 'bg-green-100 text-green-800'
-                          : task.status === 'submitted'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          :                         task.status === 'rejected'
-                          ? 'bg-red-100 text-red-800'
-                          : task.status === 'declined'
-                          ? 'bg-orange-100 text-orange-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {task.status === 'pending' && '대기 중'}
-                      {task.status === 'ongoing' && '진행 중'}
-                      {task.status === 'submitted' && '제출됨'}
-                      {task.status === 'approved' && '승인됨'}
-                      {task.status === 'rejected' && '거부됨'}
-                      {task.status === 'declined' && '리뷰어 거절'}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          task.status === 'approved'
+                            ? 'bg-green-100 text-green-800'
+                            : task.status === 'submitted'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            :                         task.status === 'rejected'
+                            ? 'bg-red-100 text-red-800'
+                            : task.status === 'declined'
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {task.status === 'pending' && '대기 중'}
+                        {task.status === 'ongoing' && '진행 중'}
+                        {task.status === 'submitted' && '제출됨'}
+                        {task.status === 'approved' && '승인됨'}
+                        {task.status === 'rejected' && '거부됨'}
+                        {task.status === 'declined' && '리뷰어 거절'}
+                      </span>
+                      {task.status === 'approved' && task.approved_at && (
+                        <span className="text-xs text-gray-500">
+                          {new Date(task.approved_at).toLocaleDateString('ko-KR', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                          })}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <div className="flex gap-2 flex-wrap">
