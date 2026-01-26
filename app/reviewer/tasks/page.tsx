@@ -451,7 +451,7 @@ export default function ReviewerTasksPage() {
                             {task.status === 'rejected' ? '재제출' : '가이드 확인'}
                           </button>
                         )}
-                        {task.status === 'approved' && (
+                        {(task.status === 'approved' || task.status === 'submitted') && (
                           <button
                             onClick={() => setViewingTaskId(task.id)}
                             className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm"
@@ -601,7 +601,7 @@ export default function ReviewerTasksPage() {
                         {task.status === 'rejected' ? '재제출' : '가이드 확인'}
                       </button>
                     )}
-                    {task.status === 'approved' && (
+                    {(task.status === 'approved' || task.status === 'submitted') && (
                       <button
                         onClick={() => setViewingTaskId(task.id)}
                         className="w-full px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm"
