@@ -92,6 +92,12 @@ export async function initDatabase() {
         ) THEN
           ALTER TABLE tasks ADD COLUMN region_arbitrary TEXT;
         END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'tasks' AND column_name = 'declined_at'
+        ) THEN
+          ALTER TABLE tasks ADD COLUMN declined_at TIMESTAMP;
+        END IF;
       END $$;
     `);
 
@@ -120,6 +126,7 @@ export async function initDatabase() {
         submit_link TEXT,
         status TEXT DEFAULT 'pending',
         approved_at TIMESTAMP,
+        declined_at TIMESTAMP,
         rejection_reason TEXT,
         settlement_amount INTEGER,
         created_at TIMESTAMP DEFAULT NOW()

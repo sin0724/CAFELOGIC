@@ -18,7 +18,8 @@ async function handler(req: any) {
     const result = await pool.query(
       `UPDATE tasks 
        SET status = 'declined', 
-           rejection_reason = $1
+           rejection_reason = $1,
+           declined_at = NOW()
        WHERE id = $2 AND reviewer_id = $3 
          AND (status = 'pending' OR status = 'ongoing')
        RETURNING id, status`,

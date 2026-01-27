@@ -1215,6 +1215,15 @@ function TasksPageContent() {
                           })}
                         </span>
                       )}
+                      {task.status === 'declined' && task.declined_at && (
+                        <span className="text-xs text-gray-500">
+                          {new Date(task.declined_at).toLocaleDateString('ko-KR', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                          })}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
