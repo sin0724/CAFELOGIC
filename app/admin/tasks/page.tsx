@@ -247,6 +247,31 @@ function TasksPageContent() {
     }
   };
 
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm('이 작업을 삭제하시겠습니까? 삭제된 작업은 복구할 수 없습니다.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/tasks/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task_id: taskId }),
+      });
+
+      if (res.ok) {
+        fetchData();
+        alert('작업이 삭제되었습니다.');
+      } else {
+        const data = await res.json();
+        alert(`삭제 실패: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error: any) {
+      console.error('Delete task error:', error);
+      alert(`삭제 중 오류가 발생했습니다: ${error.message || 'Unknown error'}`);
+    }
+  };
+
   const handleEditTask = (task: any) => {
     setEditingTaskId(task.id);
     setEditFormData({
@@ -1283,6 +1308,12 @@ function TasksPageContent() {
                           링크
                         </a>
                       )}
+                      <button
+                        onClick={() => handleDeleteTask(task.id)}
+                        className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
+                      >
+                        삭제
+                      </button>
                     </div>
                   </td>
                         </tr>
