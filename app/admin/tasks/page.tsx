@@ -41,7 +41,7 @@ function TasksPageContent() {
   const [selectedRegionForArbitrary, setSelectedRegionForArbitrary] = useState<string>('');
   
   // 기본 특이사항 텍스트
-  const DEFAULT_SPECIAL_NOTE = '상호 언급 가능하면 언급\n불가면 언급x, 쪽지유도';
+  const DEFAULT_SPECIAL_NOTE = '상호 언급가능하면 언급\n불가면 언급x, 쪽지유도\n댓글은 최소 1시간 텀으로 작업 부탁드립니다.';
   
   // 마감일 자동 계산 함수 (신청일 기준 +21일)
   const getDefaultDeadline = () => {
